@@ -1,0 +1,20 @@
+---
+- name: Copy dbbackup.sh script
+  tags: mariadb-backup
+  become: true
+  template:
+    src: dbbackup.sh
+    dest: /usr/local/bin/dbbackup.sh
+    mode: 0750
+
+- name: Make cron job for hourly backups
+  tags: mariadb-backup
+  become: true
+  cron:
+    name: backup mariadb
+    day: "*"
+    hour: "*"
+    minute: 55
+    cron_file: dbbackup_cron
+    user: root
+    job: /usr/local/bin/dbbackup.sh >> /var/log/dbbackup.log
